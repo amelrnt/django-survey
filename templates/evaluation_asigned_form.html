@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+<div class="container mx-auto mt-5">
+  <h1 class="text-3xl font-bold mb-4">Evaluasi untuk Aspek {{aspect.name}}</h1>
+
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="accordion" id="accordionExample">
+      {% for question in aspect.questions.all %}
+        <div class="card my-2">
+          <div class="card-header" id="headingQuestion{{ forloop.counter }}">
+            <h5 class="mb-0">
+              <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseQuestion{{ forloop.counter }}" aria-expanded="true" aria-controls="collapseQuestion{{ forloop.counter }}">
+                {{ question.name }}
+              </button>
+            </h5>
+          </div>
+          <div id="collapseQuestion{{ forloop.counter }}" class="collapse show" aria-labelledby="headingQuestion{{ forloop.counter }}" data-parent="#accordionExample">
+            <div class="card-body">
+              {% for subquestion in question.subquestions.all %}
+                <div class="sub-question mb-4">
+                  <h3 class="text-xl font-bold">{{ subquestion.question_text }}</h3>
+                    {% if subquestion.question_type == 'text' %}
+                      <div class="option-open-text">
+                        <label for="subquestion-{{ subquestion.id }}" class="block mb-2">{{ subquestion.question_text }}</label>
+                        <input type="text" name="subquestion-{{ subquestion.id }}" class="form-control">
+                      </div>
+                    {% elif subquestion.question_type == 'yes_or_no' %}
+                      <div class="option-one-selection">
+                        <label>{{ subquestion.question_text }}</label>
+                        <br/>
+                        <div class="form-check form-check-inline">
+                          <input class="form-check-input" type="radio" name="subquestion-{{ subquestion.id }}" value="Yes">
+                          <label class="form-check-label">Ya</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                          <input class="form-check-input" type="radio" name="subquestion-{{ subquestion.id }}" value="No">
+                          <label class="form-check-label">Tidak</label>
+                        </div>
+                      </div>
+                    {% elif subquestion.question_type == 'one_selection' %}
+                      <div class="option-one-selection">
+                        <label>{{ subquestion.question_text }}</label>
+                        {% for option in subquestion.options.all %}
+                          <div class="form-check">
+                            <input class="form-check-input" type="radio" name="subquestion-{{ subquestion.id }}-option" value="{{ option.id }}">
+                            <label class="form-check-label">{{ option.option_text }}</label>
+                          </div>
+                        {% endfor %}
+                      </div>
+                    {% elif subquestion.question_type == 'multi_selection' %}
+                      <div class="option-multi-selection">
+                        <label>{{ subquestion.question_text }}</label>
+                        {% for option in subquestion.options.all %}
+                          <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="subquestion-{{ subquestion.id }}-option" value="{{ option.id }}">
+                            <label class="form-check-label">{{ option.option_text }}</label>
+                          </div>
+                        {% endfor %}
+                      </div>
+                    {% endif %}
+                </div>
+              {% endfor %}
+
+              <div class="mt-4">
+                <h3 class="text-xl font-bold">Upload Document</h3>
+                {% for i in "12345" %}
+                    {% comment %} <input type="file" name="document_file_{{ i }}" class="form-control mb-2"> {% endcomment %}
+                    <input type="file" name="document_file_{{ question.id }}" class="form-control mb-2">
+                {% endfor %}
+            </div>
+
+            </div>
+          </div>
+        </div>
+    
+      {% endfor %}
+
+    </div>
+
+    <button type="submit" class="btn btn-primary mt-4">Submit</button>
+  </form>
+</div>
+
+
+<script>
+  $('#myCollapsible').collapse({
+    toggle: false
+  })
+  function toggleAccordion(id) {
+      var element = document.getElementById('collapse' + id);
+      element.classList.toggle('hidden');
+  }
+</script>
+
+{% endblock %}

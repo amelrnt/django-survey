@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="container mt-1">
+    <h1>Informasi Layanan</h1>
+    <h2 class="mt-5">Search</h2>
+    <form method="post">
+        {% csrf_token %}
+        {% crispy form %}
+        <p class="ms-2 mt-3">atau</p>
+        
+    </form>
+    <a href="https://wa.me/6281130701007?text=" title="click to open whatsapp chat"><button class="btn btn-success">
+        <i class="fa fa-whatsapp"></i> Klik</button>
+    </a>
+
+    {% if results %}
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Link</th>
+                    <th>Keyword</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for result in results %}
+                    <tr>
+                        <td>{{ result.name }}</td>
+                        <td><a href="{{ result.link }}">{{ result.link }}</a></td>
+                        <td>{{ result.keyword }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+
+    
+    
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+{% endblock %}

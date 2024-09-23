@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% load django_tables2 %}
+
+{% block content %}
+<div class="container">
+    <h1>Daftar Aspek dari </h1>
+    <form method="get">
+        {{ filter.form }}
+        <button type="submit" class="btn btn-primary">Filter</button>
+    </form>
+    {% render_table table %}
+</div>
+{% endblock %}

@@ -1,0 +1,27 @@
+<!-- templates/document_list.html -->
+{% extends 'base.html' %}
+
+{% load render_table from django_tables2 %}
+
+{% block content %}
+{% comment %} <html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document List</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body> {% endcomment %}
+
+<div class="container mt-5">
+    <h1 class="mb-4">Document List</h1>
+    {% render_table table %}
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+{% comment %} </body>
+</html> {% endcomment %}
+{% endblock %}
+
+
