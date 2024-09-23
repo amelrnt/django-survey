@@ -7,3 +7,4 @@ django_crispy_forms==2.3
 django_tables2==2.7.0
 django-unfold==0.39.0
 django-filter==24.3
+crispy-bootstrap5==2024.2

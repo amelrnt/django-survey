@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'django_filters',
     "main",
     "crispy_forms",
+    'crispy_bootstrap5',
     "django_tables2",
 ]
 
