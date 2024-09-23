@@ -20,8 +20,6 @@ from . import models
 #     pass
 
 # Register your models here.
-admin.site.register(User)
-admin.site.register(Group)
 admin.site.register(models.UserProfile)
 admin.site.register(models.Discussion)
 admin.site.register(models.GeneralInfo)
