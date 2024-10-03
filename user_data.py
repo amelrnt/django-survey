@@ -39,8 +39,8 @@ users_data = [
     {"username": "Bagian Organisasi", "email": "Evaluatororganisasi@mail.com", "role": "evaluator"},
     {"username": "Badan Kepegawaian Pengembngan Sumber Daya Manusia", "email": "Evaluatorbkpsdm@mail.com", "role": "evaluator"},
     {"username": "Dinas Pekerjaan Umum, Penataan Ruang, Perumahan dan Kawasan Permukiman", "email": "Evaluatordpuperkim@mail.com", "role": "evaluator"},
-    {"username": "Dinas Komunikasi dan Informatika", "email": "Evaluatordiskominfo@mail.com", "role": "evaluator"},
-    {"username": "Dinas Komunikasi dan Informatika 2", "email": "Evaluatordiskominfo2@mail.com", "role": "evaluator"},
+    {"username": "Dinas Komunikasi dan Informatika evaluator", "email": "Evaluatordiskominfo@mail.com", "role": "evaluator"},
+    {"username": "Dinas Komunikasi dan Informatika evaluator 2", "email": "Evaluatordiskominfo2@mail.com", "role": "evaluator"},
     {"username": "Badan Perencanaan Pembangunan Daerah, Penelitian dan Pengembangan", "email": "Evaluatorbappeda@mail.com", "role": "evaluator"},
 ]
 
@@ -57,8 +57,8 @@ aspect_data = [
     {"name": "Kebijakan Pelayanan", "evaluator": User.objects.get(username="Bagian Organisasi", email="Evaluatororganisasi@mail.com")},
     {"name": "Profesionalisme SDM", "evaluator":  User.objects.get(username="Badan Kepegawaian Pengembngan Sumber Daya Manusia", email="Evaluatorbkpsdm@mail.com")},
     {"name": "Sarana dan Prasarana", "evaluator":  User.objects.get(username="Dinas Pekerjaan Umum, Penataan Ruang, Perumahan dan Kawasan Permukiman", email="Evaluatordpuperkim@mail.com")},
-    {"name": "Sistem Informasi Pelayanan Publik (SIPP)", "evaluator":  User.objects.get(username="Dinas Komunikasi dan Informatika", email="Evaluatordiskominfo@mail.com")},
-    {"name": "Konsultasi dan Pengaduan", "evaluator":  User.objects.get(username="Dinas Komunikasi dan Informatika 2", email="Evaluatordiskominfo2@mail.com")},
+    {"name": "Sistem Informasi Pelayanan Publik (SIPP)", "evaluator":  User.objects.get(username="Dinas Komunikasi dan Informatika evaluator", email="Evaluatordiskominfo@mail.com")},
+    {"name": "Konsultasi dan Pengaduan", "evaluator":  User.objects.get(username="Dinas Komunikasi dan Informatika evaluator 2", email="Evaluatordiskominfo2@mail.com")},
     {"name": "Inovasi", "evaluator":  User.objects.get(username="Badan Perencanaan Pembangunan Daerah, Penelitian dan Pengembangan", email="Evaluatorbappeda@mail.com")},
 ]
 
