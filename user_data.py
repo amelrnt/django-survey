@@ -36,12 +36,12 @@ users_data = [
     {"username": "KECAMATAN MAYANGAN", "email": "mayangan@mail.com", "role": "assignee"},
     {"username": "KECAMATAN WONOASIH ", "email": "wonoasih@mail.com", "role": "assignee"},
     {"username": "BADAN PENANGGULANGAN BENCANA DAERAH", "email": "bpbd@mail.com", "role": "assignee"},
-    {"username": "Bagian Organisasi", "email": "Evaluatororganisasi@mail.com", "role": "evaluator"},
-    {"username": "Badan Kepegawaian Pengembngan Sumber Daya Manusia", "email": "Evaluatorbkpsdm@mail.com", "role": "evaluator"},
-    {"username": "Dinas Pekerjaan Umum, Penataan Ruang, Perumahan dan Kawasan Permukiman", "email": "Evaluatordpuperkim@mail.com", "role": "evaluator"},
-    {"username": "Dinas Komunikasi dan Informatika evaluator", "email": "Evaluatordiskominfo@mail.com", "role": "evaluator"},
-    {"username": "Dinas Komunikasi dan Informatika evaluator 2", "email": "Evaluatordiskominfo2@mail.com", "role": "evaluator"},
-    {"username": "Badan Perencanaan Pembangunan Daerah, Penelitian dan Pengembangan", "email": "Evaluatorbappeda@mail.com", "role": "evaluator"},
+    {"username": "Evaluatororganisasi", "email": "Evaluatororganisasi@mail.com", "role": "evaluator"},
+    {"username": "Evaluatorbkpsdm", "email": "Evaluatorbkpsdm@mail.com", "role": "evaluator"},
+    {"username": "Evaluatordpuperkim", "email": "Evaluatordpuperkim@mail.com", "role": "evaluator"},
+    {"username": "Evaluatordiskominfo", "email": "Evaluatordiskominfo@mail.com", "role": "evaluator"},
+    {"username": "Evaluatordiskominfo2", "email": "Evaluatordiskominfo2@mail.com", "role": "evaluator"},
+    {"username": "Evaluatorbappeda", "email": "Evaluatorbappeda@mail.com", "role": "evaluator"},
 ]
 
 for user_data in users_data:
@@ -54,12 +54,12 @@ Evaluation.objects.create(
     )
 
 aspect_data = [
-    {"name": "Kebijakan Pelayanan", "evaluator": User.objects.get(username="Bagian Organisasi", email="Evaluatororganisasi@mail.com")},
-    {"name": "Profesionalisme SDM", "evaluator":  User.objects.get(username="Badan Kepegawaian Pengembngan Sumber Daya Manusia", email="Evaluatorbkpsdm@mail.com")},
-    {"name": "Sarana dan Prasarana", "evaluator":  User.objects.get(username="Dinas Pekerjaan Umum, Penataan Ruang, Perumahan dan Kawasan Permukiman", email="Evaluatordpuperkim@mail.com")},
-    {"name": "Sistem Informasi Pelayanan Publik (SIPP)", "evaluator":  User.objects.get(username="Dinas Komunikasi dan Informatika evaluator", email="Evaluatordiskominfo@mail.com")},
-    {"name": "Konsultasi dan Pengaduan", "evaluator":  User.objects.get(username="Dinas Komunikasi dan Informatika evaluator 2", email="Evaluatordiskominfo2@mail.com")},
-    {"name": "Inovasi", "evaluator":  User.objects.get(username="Badan Perencanaan Pembangunan Daerah, Penelitian dan Pengembangan", email="Evaluatorbappeda@mail.com")},
+    {"name": "Kebijakan Pelayanan", "evaluator": User.objects.get(username="Evaluatororganisasi", email="Evaluatororganisasi@mail.com")},
+    {"name": "Profesionalisme SDM", "evaluator":  User.objects.get(username="Evaluatorbkpsdm", email="Evaluatorbkpsdm@mail.com")},
+    {"name": "Sarana dan Prasarana", "evaluator":  User.objects.get(username="Evaluatordpuperkim", email="Evaluatordpuperkim@mail.com")},
+    {"name": "Sistem Informasi Pelayanan Publik (SIPP)", "evaluator":  User.objects.get(username="Evaluatordiskominfo", email="Evaluatordiskominfo@mail.com")},
+    {"name": "Konsultasi dan Pengaduan", "evaluator":  User.objects.get(username="Evaluatordiskominfo2", email="Evaluatordiskominfo2@mail.com")},
+    {"name": "Inovasi", "evaluator":  User.objects.get(username="Evaluatorbapped", email="Evaluatorbappeda@mail.com")},
 ]
 
 for aspect_data in aspect_data:
@@ -136,12 +136,12 @@ questions_data = [
                 "subquestion_text": "Media publikasi SP",
                 "question_type": "multi_selection",
                 "options": [
-                  "Media Cetak / Non Elektronik", 
-                  "Media Elektronik", 
-                  "Media Sosial", 
-                  "Website", 
-                  "Aplikasi yang bisa diunduh", 
-                  "SIPP Nasional"
+                    "Media Cetak / Non Elektronik", 
+                    "Media Elektronik", 
+                    "Media Sosial", 
+                    "Website", 
+                    "Aplikasi yang bisa diunduh", 
+                    "SIPP Nasional"
                 ]
             },
         ]
@@ -276,7 +276,7 @@ questions_data = [
             },
         ]
     },
-  # Profesionalisme SDM
+    # Profesionalisme SDM
     {
         "name": "Tersedia waktu pelayanan yang memudahkan pengguna layanan.",
         "point_weight": 10,
@@ -290,12 +290,12 @@ questions_data = [
                 "subquestion_text": "Bagaimana pelaksanaan poin nomor 1 tersebut?",
                 "question_type": "multi_selection",
                 "options": [
-                  "Memiliki kebijakan jam pelayanan / kerja", 
-                  "Tidak ada jeda pelayanan yang berarti istirahat pegawai dilakukan secara bergilir (shift) yang dapat dibuktikan dari publikasi jam layanan kepada masyarakat.", 
-                  "Penambahan waktu layanan di luar jam pelayanan yang sudah ditentukan (masih di hari kerja).", 
-                  "Penambahan waktu layanan di luar hari kerja namun dalam kondisi tertentu (Misal: Pembukaan CPNS, LAPOR SPT Tahunan).", 
-                  "Penambahan waktu layanan di luar hari kerja namun secara rutin.", 
-                  "Layanan 24 Jam: layanan yang merupakan inti pelayanan atau pendaftaran"
+                    "Memiliki kebijakan jam pelayanan / kerja", 
+                    "Tidak ada jeda pelayanan yang berarti istirahat pegawai dilakukan secara bergilir (shift) yang dapat dibuktikan dari publikasi jam layanan kepada masyarakat.", 
+                    "Penambahan waktu layanan di luar jam pelayanan yang sudah ditentukan (masih di hari kerja).", 
+                    "Penambahan waktu layanan di luar hari kerja namun dalam kondisi tertentu (Misal: Pembukaan CPNS, LAPOR SPT Tahunan).", 
+                    "Penambahan waktu layanan di luar hari kerja namun secara rutin.", 
+                    "Layanan 24 Jam: layanan yang merupakan inti pelayanan atau pendaftaran"
                 ]
             }, 
         ]
