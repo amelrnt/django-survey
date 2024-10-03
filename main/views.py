@@ -9,162 +9,185 @@ from django_tables2.views import SingleTableMixin
 
 from .filters import AspectFilter
 from .forms import DiscussionForm, GeneralInfoForm
-from .models import (Answer, Aspect, AssignedEvaluation, Discussion, Document,
+from .models import (Answer, Aspect, AssignedEvaluation, Discussion,
                     EvaluatorOption, FileAttachment, GeneralInfo,
-                    Question, QuestionOption, EvaluatorResponse)
-from .tables import AspectTable, DocumentTable, EvaluationTable, ScoreTable
+                    Question, QuestionOption, EvaluatorResponse, Document)
+from .tables import AspectTable, EvaluationTable, ScoreTable, EvaluatorTable
 from django.contrib import messages
-
-# Create your views here.
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 def index(request):
     return render(request, 'index.html')
 
-# def score_all_evaluation(request):
-#     return render(request, 'score_dashboard.html')
+def score_detail(request, evaluation_id):
+    assigned_evaluation = get_object_or_404(AssignedEvaluation, id=evaluation_id)
+    aspects_with_scores = []
+    aspects = Aspect.objects.all()
 
-def score_detail(request):
-    return render(request, 'evaluation_score_summary.html')
+    for aspect in aspects:
+        total_score = 0
+        questions = Question.objects.filter(aspect=aspect)
+        question_with_scores = []
+
+        for question in questions:
+            evaluator_responses = EvaluatorResponse.objects.filter(
+                question=question, assigned_user=assigned_evaluation.assigned_user
+            )
+
+            if evaluator_responses.exists():
+                for response in evaluator_responses:
+                    total_score += response.calculate_score()
+
+            question_with_scores.append({
+                'question': question,
+                'evaluator_responses': evaluator_responses,
+            })
+        aspects_with_scores.append({
+            'aspect': aspect,
+            'questions_with_scores': question_with_scores,
+            'total_score': total_score
+        })
+    context = {
+        'assigned_evaluation': assigned_evaluation,
+        'aspects_with_scores': aspects_with_scores
+    }
+
+    return render(request, 'evaluation_score_summary.html', context)
 
 def show_discussion(request):
     results = Discussion.objects.all()
     return render(request, 'discussion_list.html', {'results': results})
 
-def show_evaluation(request):
-    return render(request, 'evaluation_form.html') # TODO: Map date later
-
-def show_evaluator(request):
-    return render(request, 'evaluator_form_template.html') # TODO: Map date later
-
-def evaluator_view(request, aspect_id):
-    aspect = get_object_or_404(Aspect, id=aspect_id)
-    questions = Question.objects.filter(aspect=aspect)
+@login_required 
+def evaluator_view(request, assigned_user_id):
     
-    question_with_options = []
-    for question in questions:
-        options = EvaluatorOption.objects.filter(question=question)
-        question_with_options.append({
-            'question': question,
-            'options': options
-        })
-    
-    context = {
-        'aspect': aspect,
-        'question_with_options': question_with_options,
-    }
-    return render(request, 'evaluator_form.html', context)
-
-def evaluator_view_new(request, aspect_id, assigned_user_id):
-    #TODO: load evaluator response if already answered
-    aspect = get_object_or_404(Aspect, id=aspect_id)
+    evaluator = request.user
+    aspect = get_object_or_404(Aspect, evaluator=evaluator)
     questions = Question.objects.filter(aspect=aspect)
     answers = Answer.objects.filter(user=assigned_user_id)
+
+    evaluator_responses = EvaluatorResponse.objects.filter(assigned_user=assigned_user_id)
     
     question_with_options = []
     for question in questions:
-        # Get evaluator options for each question
         options = EvaluatorOption.objects.filter(question=question)
-        # Get answers for the subquestions related to the current question
         question_answers = answers.filter(subquestion__question=question)
+
+        question_responses = evaluator_responses.filter(question=question)
 
         question_with_options.append({
             'question': question,
             'options': options,
-            'answers': question_answers
+            'answers': question_answers,
+            'responses': question_responses
         })
     
     context = {
         'aspect': aspect,
         'question_with_options': question_with_options,
         'assigned_user_id': assigned_user_id,
+        'response': {}
     }
 
+    for question in questions:
+        question_response = evaluator_responses.filter(question=question).first()  # Get the first response for each question
+        if question_response:
+            context['response'][f'question{question.id}'] = question_response.score
+
     if request.method == 'POST':
-        # Save evaluator responses
         for question in aspect.questions.all():
             evaluator_score = request.POST.get(f'question_{question.id}')
             if evaluator_score:
-                EvaluatorResponse.objects.create(
+                evaluator_response, created = EvaluatorResponse.objects.get_or_create(
                     question=question,
                     evaluator=request.user,
                     assigned_user_id=assigned_user_id,
                     score=int(evaluator_score)
                 )
+                evaluator_response.score = int(evaluator_score)
+                evaluator_response.save()
         
         messages.success(request, "Evaluation submitted successfully!")
-        return render(request, 'evaluator_form.html', context) #TODO: fix later
+        return render(request, 'evaluator_form.html', context)
     
     return render(request, 'evaluator_form.html', context)
     
+@login_required    
 def evaluation_view(request, aspect_id):
-    #TODO: load user answer if already answered
     aspect = get_object_or_404(Aspect, pk=aspect_id)
-    # file_attachments = FileAttachment.objects.filter(question=aspect)
+    assigned_user = request.user
     
     context = {
-        # 'file_attachments': file_attachments,
-        # 'evaluation': evaluation,
         'aspect': aspect,
-        # 'assigned_user_id': assigned_user_id,
+        'answers': {}
     }
+    for question in aspect.questions.all():
+        #TODO: also load the uploaded document
+        for subquestion in question.subquestions.all():
+            answer = Answer.objects.filter(subquestion=subquestion, user=assigned_user).first()
+            if answer:
+                if subquestion.question_type in ['text', 'yes_or_no']:
+                    context['answers'][f'subquestion{subquestion.id}'] = answer.text_answer
+                elif subquestion.question_type in ['one_selection', 'multi_selection']:
+                    selected_options = answer.selected_options.all()
+                    context['answers'][f'subquestion{subquestion.id}'] = [option.id for option in selected_options]
+        # document = FileAttachment.objects.filter(question=question, uploader=assigned_user).first()
+        # if document:
+        #     context['documents'][question.id] = document.file
+
     if request.method == 'POST':
-        # Handle the file uploads
-        assigned_user = request.user
-        
-        # Loop through all questions for the specific aspect
         for question in Question.objects.all():
-            # Process the file uploads for each question
             file_key = f'document_file_{question.id}'
             if file_key in request.FILES:
                 uploaded_file = request.FILES[file_key]
                 fs = FileSystemStorage()
                 file_path = fs.save(uploaded_file.name, uploaded_file)
-                
-                # Create a FileAttachment instance
-                FileAttachment.objects.create(
-                    file=file_path,
+                file_attachment, created = FileAttachment.objects.get_or_create(
                     question=question,
-                    uploader=assigned_user
+                    uploader=assigned_user,
                 )
+                file_attachment.file = file_path  # Update the file path
+                file_attachment.save()
 
-            # Handle subquestion responses
             for subquestion in question.subquestions.all():
                 response_key = f'subquestion-{subquestion.id}'
                 
-                # Handle open text questions
                 if subquestion.question_type in  ['text', 'yes_or_no' ]:
                     response_text = request.POST.get(response_key, '')
-                    Answer.objects.create(
+                    answer, created = Answer.objects.get_or_create(
                         subquestion=subquestion,
                         user=assigned_user,
-                        text_answer=response_text
                     )
+                    answer.text_answer = response_text
+                    answer.save()
                 
-                # Handle one-selection questions (radio buttons)
                 elif subquestion.question_type == 'one_selection':
                     selected_option_id = request.POST.get(response_key, '')
                     selected_option = QuestionOption.objects.get(id=selected_option_id)
-                    answer = Answer.objects.create(
+                    answer, created = Answer.objects.get_or_create(
                         subquestion=subquestion,
                         user=assigned_user,
                     )
+                    answer.selected_options.clear()
                     answer.selected_options.add(selected_option)
+                    answer.save()
                 
-                # Handle multi-selection questions (checkboxes)
                 elif subquestion.question_type == 'multi_selection':
                     selected_option_ids = request.POST.getlist(f'{response_key}-option')
-                    answer = Answer.objects.create(
+                    answer, created = Answer.objects.get_or_create(
                         subquestion=subquestion,
                         user=assigned_user,
                     )
+                    answer.selected_options.clear()
                     for option_id in selected_option_ids:
                         selected_option = QuestionOption.objects.get(id=option_id)
                         answer.selected_options.add(selected_option)
+                    answer.save()
 
-        # Redirect to a success page or display a success message
         return render(request, 'evaluation_asigned_form.html', context)
 
-    # If it's a GET request, render the form
     return render(request, 'evaluation_asigned_form.html', context)
 
 def create_discussion(request):
@@ -198,14 +221,21 @@ def pdf_view(request, pk):
 class ScoreListView(SingleTableMixin, FilterView):
     table_class = ScoreTable
     model = AssignedEvaluation
-    template_name = "evaluation_list.html"
+    template_name = "score_dashboard.html"
 
-class EvaluationListView(SingleTableMixin, FilterView):
-    #TODO : add condition if evaluator show all
+class EvaluationListView(LoginRequiredMixin, SingleTableMixin, FilterView):
     #TODO : if assigned user only show if the user is in assigned_user
     table_class = EvaluationTable
     model = AssignedEvaluation
     template_name = "evaluation_list.html"
+
+    def get_queryset(self):
+        return AssignedEvaluation.objects.filter(assigned_user=self.request.user)
+
+class EvaluatorListView(SingleTableMixin, FilterView):
+    table_class = EvaluatorTable
+    model = AssignedEvaluation
+    template_name = "evaluator_list.html"
 
 class AspectListView(SingleTableMixin, FilterView):
     #TODO : add condition if asigned user show all
@@ -226,8 +256,3 @@ class AspectListView(SingleTableMixin, FilterView):
     #     context['evaluation'] = Evaluation.objects.get(pk=self.kwargs['pk'])
     #     return context
 
-
-class DocumentListView(SingleTableView):
-    model = Document
-    table_class = DocumentTable
-    template_name = "document_list.html"

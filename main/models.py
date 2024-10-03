@@ -27,7 +27,6 @@ class Discussion(models.Model):
     }
 
     name = models.CharField(max_length=255)
-    identity_number = models.CharField(max_length=50)
     phone_number = models.CharField(max_length=20)
     question_type = models.CharField(
         max_length=1,
@@ -42,7 +41,6 @@ class Discussion(models.Model):
 
 
 class GeneralInfo(models.Model):
-    
     name = models.CharField(max_length=50)
     link = models.URLField()
     keyword = models.CharField(max_length=255)
@@ -77,8 +75,6 @@ class AssignedEvaluation(models.Model):
     assigned_user = models.ForeignKey(User, related_name='assigned_evaluations', on_delete=models.CASCADE)
     evaluation = models.ForeignKey(Evaluation, related_name='evaluation', on_delete=models.CASCADE)
 
-    question_count = models.IntegerField(default=0) 
-    answer_count = models.IntegerField(default=0)
     score = models.IntegerField(default=0)
     score_category = models.CharField(max_length=5, choices=SCORE_CATEGORY, default=None, blank=True, null=True)
 
@@ -86,7 +82,11 @@ class AssignedEvaluation(models.Model):
         return f"{self.evaluation.name} {self.assigned_user}"
 
     def calculate_progress(self):
-        return (self.answer_count / self.question_count * 100) if self.question_count > 0 else 0
+        total_questions = Question.objects.filter(aspect__evaluation=self).count()
+        answered_questions = Answer.objects.filter(subquestion__question__aspect__evaluation=self, user=self.assigned_user).count()
+        if total_questions == 0:
+            return 0
+        return (answered_questions / total_questions) * 100
 
     def calculate_final_score(self):
         evaluator_responses = self.evaluator_responses.all()  # Use related_name to access EvaluatorResponse
@@ -109,20 +109,25 @@ class AssignedEvaluation(models.Model):
     def get_absolute_url(self):
         return reverse('aspect-list', kwargs={'pk': self.pk})
     
+    def get_evaluator_url(self):
+        return reverse('evaluator-form', kwargs={'assigned_user_id': self.assigned_user_id})
+    
     def get_scoring_detail_url(self):
-        return reverse('score_detail')
+        return reverse('score-detail', kwargs={'evaluation_id': self.id})
 
 class Aspect(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
-    question_count = models.IntegerField(default=0)
-    answer_count = models.IntegerField(default=0) 
     evaluator = models.ForeignKey(User, related_name='aspect_evaluator', on_delete=models.CASCADE)
-    #TODO: add field based on evaluation so if there any new evaluation later its dont messed up
-    # evaluation = models.ForeignKey(Evaluation, related_name='evaluation', on_delete=models.CASCADE)
 
     def __str__(self):
         return self.name
+    
+    def count_subquestion(self):
+        return 0
+    
+    def count_answer(self):
+        return 0
 
     def get_absolute_url(self):
         return reverse('evaluation-form', kwargs={'aspect_id': self.pk})
@@ -158,7 +163,6 @@ class SubQuestion(models.Model):
     def __str__(self):
         return self.question_text
 
-
 # Answer model for respondents
 class Answer(models.Model):
     subquestion = models.ForeignKey(SubQuestion, related_name='answers', on_delete=models.CASCADE)
@@ -173,7 +177,11 @@ class Answer(models.Model):
 class EvaluatorOption(models.Model):
     question = models.ForeignKey(Question, related_name='evaluation_questions', on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
-    score = models.IntegerField(default=0)
+    score = models.IntegerField(choices=[(i, str(i)) for i in range(0, 6)])
+
+    def calculate_score(self):
+        """Calculate the final score based on the evaluator's selection."""
+        return round((self.score / 5) * self.question.point_weight, 2)
 
     def __str__(self):
         return f"Option {self.score} for {self.question}"
@@ -183,11 +191,11 @@ class EvaluatorResponse(models.Model):
     question = models.ForeignKey(Question, related_name='evaluator_responses', on_delete=models.CASCADE)
     evaluator = models.ForeignKey(User, related_name='evaluator', on_delete=models.CASCADE)
     assigned_user = models.ForeignKey(User, related_name='assigned_responses', on_delete=models.CASCADE)
-    score = models.IntegerField(choices=[(i, str(i)) for i in range(1, 6)])  # 1-5 scale
+    score = models.IntegerField(choices=[(i, str(i)) for i in range(0, 6)])  # 1-5 scale
 
     def calculate_score(self):
         """Calculate the final score based on the evaluator's selection."""
-        return (self.score / 5) * self.question.point_weight
+        return round((self.score / 5) * self.question.point_weight, 2)
 
     def __str__(self):
         return f"Response by {self.evaluator} for {self.question}"
@@ -200,4 +208,4 @@ class FileAttachment(models.Model):
 
     def __str__(self):
         return f"{self.file.name} uploaded by {self.uploader} on {self.question.name}"
-    
+

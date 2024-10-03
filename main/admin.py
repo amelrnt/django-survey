@@ -4,7 +4,6 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import Group, User
 from unfold.admin import ModelAdmin
 
-
 from . import models
 
 admin.site.unregister(User)
@@ -23,7 +22,6 @@ class GroupAdmin(BaseGroupAdmin, ModelAdmin):
 admin.site.register(models.UserProfile)
 admin.site.register(models.Discussion)
 admin.site.register(models.GeneralInfo)
-admin.site.register(models.Document)
 admin.site.register(models.Evaluation)
 admin.site.register(models.AssignedEvaluation)
 admin.site.register(models.Aspect)

@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 
 {% load crispy_forms_tags %}
+{% load main_extras %}
 
 {% block content %}
 
@@ -27,18 +28,18 @@
                     {% if subquestion.question_type == 'text' %}
                       <div class="option-open-text">
                         <label for="subquestion-{{ subquestion.id }}" class="block mb-2">{{ subquestion.question_text }}</label>
-                        <input type="text" name="subquestion-{{ subquestion.id }}" class="form-control">
+                        <input type="text" name="subquestion-{{ subquestion.id }}" class="form-control" value="{{ answers|get_answer:subquestion.id|default:'' }}" />
                       </div>
                     {% elif subquestion.question_type == 'yes_or_no' %}
                       <div class="option-one-selection">
                         <label>{{ subquestion.question_text }}</label>
                         <br/>
                         <div class="form-check form-check-inline">
-                          <input class="form-check-input" type="radio" name="subquestion-{{ subquestion.id }}" value="Yes">
+                          <input class="form-check-input" type="radio" name="subquestion-{{ subquestion.id }}" value="Yes" {% if "Yes" == answers|get_answer:subquestion.id %}checked{% endif %}>
                           <label class="form-check-label">Ya</label>
                         </div>
                         <div class="form-check form-check-inline">
-                          <input class="form-check-input" type="radio" name="subquestion-{{ subquestion.id }}" value="No">
+                          <input class="form-check-input" type="radio" name="subquestion-{{ subquestion.id }}" value="No" {% if "No" == answers|get_answer:subquestion.id %}checked{% endif %}>
                           <label class="form-check-label">Tidak</label>
                         </div>
                       </div>
@@ -47,7 +48,7 @@
                         <label>{{ subquestion.question_text }}</label>
                         {% for option in subquestion.options.all %}
                           <div class="form-check">
-                            <input class="form-check-input" type="radio" name="subquestion-{{ subquestion.id }}-option" value="{{ option.id }}">
+                            <input class="form-check-input" type="radio" name="subquestion-{{ subquestion.id }}-option" value="{{ option.id }}" {% if option.id in answers|get_answer:subquestion.id %}checked{% endif %}>
                             <label class="form-check-label">{{ option.option_text }}</label>
                           </div>
                         {% endfor %}
@@ -57,7 +58,7 @@
                         <label>{{ subquestion.question_text }}</label>
                         {% for option in subquestion.options.all %}
                           <div class="form-check">
-                            <input class="form-check-input" type="checkbox" name="subquestion-{{ subquestion.id }}-option" value="{{ option.id }}">
+                            <input class="form-check-input" type="checkbox" name="subquestion-{{ subquestion.id }}-option" value="{{ option.id }}" {% if option.id in answers|get_answer:subquestion.id %}checked{% endif %}>
                             <label class="form-check-label">{{ option.option_text }}</label>
                           </div>
                         {% endfor %}
@@ -69,7 +70,6 @@
               <div class="mt-4">
                 <h3 class="text-xl font-bold">Upload Document</h3>
                 {% for i in "12345" %}
-                    {% comment %} <input type="file" name="document_file_{{ i }}" class="form-control mb-2"> {% endcomment %}
                     <input type="file" name="document_file_{{ question.id }}" class="form-control mb-2">
                 {% endfor %}
             </div>

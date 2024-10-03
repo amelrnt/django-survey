@@ -6,38 +6,36 @@
 <div class="mx-4"> 
 
   <div class="row d-flex justify-content-between">
-    <h1 style="width: 500px;">Pertanyaan dan Saran</h1>
+    <h1 style="width: 500px;">Pertanyaan dan Saran </h1>
     <div  style="width: 250px;">
       <a type="button" href="/discussion_create" class="btn btn-info" style="width: 180px;">Tambah Pertanyaan</a>
-    </div>    
+    </div>
   </div>
 
-  {% if results %}
-    {% for result in results %}
-    <div class="card my-2">
-      <div class="card-header">
-        {% if result.question_type == 'Q'%}
-        Pertanyaan
-        {% else %}
-        Saran
-        {% endif %}
-      </div>
-      <div class="card-body">
-        <h5 class="card-title">{{result.name}}</h5>
-        <p class="card-subtitle text-muted">{{result.phone_number}}</p>
-        <p class="card-text">{{result.question}}</p>
-        {% if result.answer %}
-          {% if result.question_type == 'Q'%}
-          <p class="card-text text-danger">Jawaban</p>
-          {% else %}
-          <p class="card-text text-danger">Tanggapan</p>
-          {% endif %}
-          <p class="card-text">{{result.answer}}</p>
-        {% endif %}
-      </div>
+  {% for result in results %}
+  <div class="card my-2">
+    <div class="card-header">
+      {% if result.question_type == 'Q'%}
+      Pertanyaan
+      {% else %}
+      Saran
+      {% endif %}
     </div>
-    {% endfor %}
-  {% endif %}
+    <div class="card-body">
+      <h5 class="card-title">{{result.name}}</h5>
+      <p class="card-subtitle text-muted">{{result.phone_number}}</p>
+      <p class="card-text">{{result.question}}</p>
+      {% if result.answer %}
+        {% if result.question_type == 'Q'%}
+        <p class="card-text text-danger">Jawaban</p>
+        {% else %}
+        <p class="card-text text-danger">Tanggapan</p>
+        {% endif %}
+        <p class="card-text">{{result.answer}}</p>
+      {% endif %}
+    </div>
+  </div>
+  {% endfor %}
 
 </div>
 {% endblock %}

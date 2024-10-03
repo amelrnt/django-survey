@@ -4,99 +4,53 @@
 <div class="mx-4"> 
   <h3>Detail Penilaian</h3>
 
-  <p>Periode	:	23 Jul - 31 Jul</p>
-  <p>Instansi	:	assigned_user</p>
-  <p>Unit Layanan	:	Evaluasi Formulir Pemerintah</p>
+  <p>Periode	:{{ assigned_evaluation.date_start }} - {{ assigned_evaluation.date_end }}</p>
+  <p>Instansi	:	{{ assigned_evaluation.assigned_user }}</p>
+  <p>Unit Layanan	: {{ assigned_evaluation }}	</p>
 
   <table class="table">
     <thead>
-      <tr>
-        <th scope="col">#</th>
-        <th scope="col">Prinsip/Indikator</th>
-        <th scope="col">Bobot Aspek</th>
-        <th scope="col">Bobot Indikator</th>
-        <th scope="col">Nilai</th>
-        <th scope="col">Index</th>
-      </tr>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Prinsip/Indikator</th>
+            <th scope="col">Bobot Aspek</th>
+            <th scope="col">Bobot Indikator</th>
+            <th scope="col">Nilai</th>
+            <th scope="col">Index</th>
+        </tr>
     </thead>
     <tbody>
-      <tr>
-        <th scope="row">1</th>
-        <td>Tersedia Standar Pelayanan (SP) sesuai dengan ketentuan peraturan perundang- undangan yang berlaku.</td>
-        <td></td>
-        <td>17%	</td>
-        <td>4</td>
-        <td></td>
-      </tr>
-      <tr>
-        <th scope="row">1</th>
-        <td>Proses penyusunan dan perubahan SP telah melibatkan unsur masyarakat.</td>
-        <td></td>
-        <td>14%</td>
-        <td>4</td>
-        <td></td>
-      </tr>
-      <tr>
-        <th scope="row">1</th>
-        <td>Jumlah media publikasi untuk komponen service delivery</td>
-        <td></td>
-        <td>7%</td>
-        <td>4</td>
-        <td></td>
-      </tr>
-      <tr>
-        <th scope="row">1</th>
-        <td>Telah dilakukan peninjauan ulang secara berkala terhadap Standar Pelayanan.</td>
-        <td></td>
-        <td>14%</td>
-        <td>0</td>
-        <td></td>
-      </tr>
-      <tr>
-        <th scope="row">1</th>
-        <td>Pemenuhan siklus Maklumat Pelayanan (ketersediaan, penetapan, dan publikasi)</td>
-        <td></td>
-        <td>10%</td>
-        <td>0</td>
-        <td></td>
-      </tr>
-      <tr>
-        <th scope="row">1</th>
-        <td>SKM yang dilaksan</td>
-        <td></td>
-        <td>17%</td>
-        <td>0</td>
-        <td></td>
-      </tr>
-      <tr>
-        <th scope="row">1</th>
-        <td>Jumlah media publikasi hasil SKM.</td>
-        <td></td>
-        <td>7%</td>
-        <td>0</td>
-        <td></td>
-      </tr>
-      <tr>
-        <th scope="row">1</th>
-        <td>Persentase rencana tindak lanjut hasil SKM yang telah selesai ditindaklanjuti</td>
-        <td></td>
-        <td>7%</td>
-        <td>0</td>
-        <td></td>
-      </tr>
-      <tr>
-        <th scope="row">1</th>
-        <td>Persentase rencana tindak lanjut hasil SKM yang telah selesai ditindaklanjuti</td>
-        <td></td>
-        <td>7%</td>
-        <td>0</td>
-        <td></td>
-      </tr>
-      <tr>
-        <td colspan=6 style="text-align: right;">0.9</td>
-      </tr>
+        {% for aspect_data in aspects_with_scores %}
+            <tr>
+                <td colspan=6 style="text-align: center;">{{ aspect_data.aspect.name }} (100%)</td> <!-- Aspect Name -->
+            </tr>
+            {% for question_data in aspect_data.questions_with_scores %}
+                <tr>
+                    <td scope="row">{{ forloop.counter }}</td>
+                    <td>{{ question_data.question.name }}</td>
+                    <td>
+                      
+                    </td> 
+                    <td>{{ question_data.question.point_weight }}%</td> 
+                    <td>
+                        {% for response in question_data.evaluator_responses %}
+                            {{ response.score }} 
+                        {% endfor %}
+                    </td>
+                    <td>{% for response in question_data.evaluator_responses %}
+                          {{ response.calculate_score }}            
+                          {% endfor %}
+                    </td>
+                </tr>
+            {% endfor %}
+            <tr>
+              <td colspan=6 style="text-align: end;">{{ aspect_data.total_score}} %</td>
+          </tr>
+        {% endfor %}
     </tbody>
-  </table>
+</table>
+
+
 </div>
 {% endblock %}
 
