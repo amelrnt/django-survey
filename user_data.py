@@ -59,7 +59,7 @@ aspect_data = [
     {"name": "Sarana dan Prasarana", "evaluator":  User.objects.get(username="Evaluatordpuperkim", email="Evaluatordpuperkim@mail.com")},
     {"name": "Sistem Informasi Pelayanan Publik (SIPP)", "evaluator":  User.objects.get(username="Evaluatordiskominfo", email="Evaluatordiskominfo@mail.com")},
     {"name": "Konsultasi dan Pengaduan", "evaluator":  User.objects.get(username="Evaluatordiskominfo2", email="Evaluatordiskominfo2@mail.com")},
-    {"name": "Inovasi", "evaluator":  User.objects.get(username="Evaluatorbapped", email="Evaluatorbappeda@mail.com")},
+    {"name": "Inovasi", "evaluator":  User.objects.get(username="Evaluatorbappeda", email="Evaluatorbappeda@mail.com")},
 ]
 
 for aspect_data in aspect_data:
