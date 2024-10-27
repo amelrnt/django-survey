@@ -154,7 +154,7 @@ def evaluation_view(request, aspect_id):
             for subquestion in question.subquestions.all():
                 response_key = f'subquestion-{subquestion.id}'
                 
-                if subquestion.question_type in  ['text', 'yes_or_no' ]:
+                if subquestion.question_type in  ['text', 'yes_or_no']:
                     response_text = request.POST.get(response_key, '')
                     answer, created = Answer.objects.get_or_create(
                         subquestion=subquestion,
@@ -163,18 +163,7 @@ def evaluation_view(request, aspect_id):
                     answer.text_answer = response_text
                     answer.save()
                 
-                elif subquestion.question_type == 'one_selection':
-                    selected_option_id = request.POST.get(response_key, '')
-                    selected_option = QuestionOption.objects.get(id=selected_option_id)
-                    answer, created = Answer.objects.get_or_create(
-                        subquestion=subquestion,
-                        user=assigned_user,
-                    )
-                    answer.selected_options.clear()
-                    answer.selected_options.add(selected_option)
-                    answer.save()
-                
-                elif subquestion.question_type == 'multi_selection':
+                elif subquestion.question_type in ['multi_selection','one_selection']:
                     selected_option_ids = request.POST.getlist(f'{response_key}-option')
                     answer, created = Answer.objects.get_or_create(
                         subquestion=subquestion,
