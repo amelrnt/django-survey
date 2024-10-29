@@ -26,24 +26,25 @@ class Discussion(models.Model):
         'S' : "Saran",
     }
 
-    name = models.CharField(max_length=255)
-    phone_number = models.CharField(max_length=20)
+    name = models.CharField(max_length=255, verbose_name="Nama")
+    phone_number = models.CharField(max_length=20, verbose_name="Nomor Telpon")
     question_type = models.CharField(
         max_length=1,
         choices=QUESTION_CHOICES,
+        verbose_name="Pertanyaan/Saran"
     )
-    assigned_user = models.ForeignKey(User, related_name='assigned_question', on_delete=models.CASCADE)
-    question = models.TextField()
-    answer = models.TextField()
+    assigned_user = models.ForeignKey(User, related_name='assigned_question', on_delete=models.CASCADE, verbose_name="Kantor Pemerintah")
+    question = models.TextField(verbose_name="Pertanyaan")
+    answer = models.TextField(verbose_name="Jawaban")
 
     def __str__(self):
         return f"{self.question} for {self.assigned_user}"
 
 
 class GeneralInfo(models.Model):
-    name = models.CharField(max_length=50)
+    name = models.CharField(max_length=255)
     link = models.URLField()
-    keyword = models.CharField(max_length=255)
+    keyword = models.TextField(verbose_name="Kata Kunci")
 
     def __str__(self):
         return self.name
@@ -69,17 +70,17 @@ class AssignedEvaluation(models.Model):
         ("E", "Sangat Buruk"),
         ("F", "Gagal"),
     )
-    date_start = models.DateField()
-    date_end = models.DateField()
+    date_start = models.DateField(verbose_name="Tanggal Mulai")
+    date_end = models.DateField(verbose_name="Tanggal Berakhir")
     date_deadline = models.DateField()
-    assigned_user = models.ForeignKey(User, related_name='assigned_evaluations', on_delete=models.CASCADE)
+    assigned_user = models.ForeignKey(User, related_name='assigned_evaluations', on_delete=models.CASCADE, verbose_name="Kantor Pemerintah")
     evaluation = models.ForeignKey(Evaluation, related_name='evaluation', on_delete=models.CASCADE)
 
-    score = models.IntegerField(default=0)
-    score_category = models.CharField(max_length=5, choices=SCORE_CATEGORY, default=None, blank=True, null=True)
+    score = models.IntegerField(default=0, verbose_name="Nilai")
+    score_category = models.CharField(max_length=5, choices=SCORE_CATEGORY, default=None, blank=True, null=True, verbose_name="Kategori Nilai")
 
     def __str__(self):
-        return f"{self.evaluation.name} {self.assigned_user}"
+        return f"{self.assigned_user}"
 
     def calculate_progress(self):
         total_questions = Question.objects.filter(aspect__evaluation=self).count()

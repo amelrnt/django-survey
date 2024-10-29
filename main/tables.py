@@ -1,17 +1,18 @@
 import django_tables2 as tables
 from django.utils.html import format_html
 from .models import Evaluation, Aspect, AssignedEvaluation
+import itertools
 
 class EvaluationTable(tables.Table):
     progress = tables.Column()
 
     # Custom column for the button
     fill_survey = tables.Column(empty_values=(), verbose_name="Action")
-    evaluation_info = tables.Column(empty_values=(), verbose_name="Evaluation Info")
+    evaluation_info = tables.Column(empty_values=(), verbose_name="Nama Perangkat Daerah")
 
     def render_fill_survey(self, record):
         return format_html(
-            '<a href="{}" class="btn btn-primary">See Details</a>',
+            '<a href="{}" class="btn btn-primary">Details</a>',
             record.get_absolute_url()
         )
     
@@ -32,11 +33,11 @@ class EvaluatorTable(tables.Table):
 
     # Custom column for the button
     fill_survey = tables.Column(empty_values=(), verbose_name="Action")
-    evaluator_info = tables.Column(empty_values=(), verbose_name="Evaluation Info")
+    evaluator_info = tables.Column(empty_values=(), verbose_name="Nama Perangkat Daerah")
 
     def render_fill_survey(self, record):
         return format_html(
-            '<a href="{}" class="btn btn-primary">See Details</a>',
+            '<a href="{}" class="btn btn-primary">Details</a>',
             record.get_evaluator_url()
         )
     
@@ -50,23 +51,32 @@ class EvaluatorTable(tables.Table):
 
 
 class ScoreTable(tables.Table):
-    # Custom column for the button
+    row_number = tables.Column(empty_values=(), verbose_name="No")
     see_details = tables.Column(empty_values=(), verbose_name="Action")
-    score_info = tables.Column(empty_values=(), verbose_name="Evaluation Info")
+    score_info = tables.Column(empty_values=(), verbose_name="Nama Perangkat Daerah")
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.counter = itertools.count()
+
 
     def render_see_details(self, record):
         return format_html(
-            '<a href="{}" class="btn btn-primary">See Details</a>',
+            '<a href="{}" class="btn btn-primary">Detail</a>',
             record.get_scoring_detail_url()
         )
     
     def render_score_info(self, record):
         return str(record)
+    
+    def render_row_number(self):
+        return f"{next(self.counter) + 1}"
 
     class Meta:
+        attrs = {'class': 'table table-striped table-hover'}
         model = AssignedEvaluation
         template_name = "django_tables2/bootstrap5-responsive.html"
-        fields = ("score_info", "score", "score_category")
+        fields = ("row_number","score_info", "score", "score_category")
 
 
 class AspectTable(tables.Table):

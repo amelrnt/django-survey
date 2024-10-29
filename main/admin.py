@@ -32,3 +32,7 @@ admin.site.register(models.Answer)
 admin.site.register(models.QuestionOption)
 admin.site.register(models.FileAttachment)
 admin.site.register(models.EvaluatorOption)
+
+admin.site.site_title = "Rumah Selpi Login"
+admin.site.site_header = "Rumah Selpi Admin"
+admin.site.index_title = "Rumah Selpi Admin"

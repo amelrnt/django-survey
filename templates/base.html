@@ -161,7 +161,7 @@
               >
                 {{ user.username|slice:":1"|upper }}
               </div>
-              <span class="d-none d-sm-inline mx-1">{{ user.username }}</span>
+              <span class="d-none d-sm-inline mx-1 text-truncate" style="max-width: 175px; display: inline-block;">{{ user.username }}</span>
             </a>
             <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
               {% comment %}
